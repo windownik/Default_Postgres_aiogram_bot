@@ -3,8 +3,9 @@ from main import dp
 from aiogram.dispatcher.filters import Text
 import logging
 from modules.sql_func import insert_user, read_by_name, all_users_table, \
-    update_db, create_fast_info_table, sender_table
-from modules.dispatcher import Admin
+    update_db, create_fast_info_table, sender_table, read_all
+from modules.handlers.admin_handlers.download_users import upload_all_data, upload_all_users_id
+from modules.dispatcher import bot, Admin
 from aiogram.dispatcher import FSMContext
 from modules.keyboards import start_user_kb, start_admin_kb
 
@@ -59,3 +60,32 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     logging.info('Cancelling state %r', current_state)
     # Cancel state and inform user about it
     await state.finish()
+
+
+# Set admin
+@dp.message_handler(commands=['id'], state='*')
+async def start_menu(message: types.Message):
+    await message.answer(f'Твой {message.from_user.id}\n'
+                         f'Чат {message.chat.id}')
+
+
+# Get users
+@dp.message_handler(commands=['get_all_users'], state='*')
+async def start_menu(message: types.Message):
+    await message.answer(f'Начал собирать файл')
+    data = read_all()
+    number, bad = upload_all_data(data)
+    await message.answer(f'Успешно {number}, ошибок {bad}\n\nЗагружаю')
+    with open("all_users.xlsx", 'rb') as file:
+        await bot.send_document(chat_id=message.from_user.id, document=file, caption="Все сделано!")
+
+
+# Get users
+@dp.message_handler(commands=['get_all_users_id'], state='*')
+async def start_menu(message: types.Message):
+    await message.answer(f'Начал собирать файл')
+    data = read_all()
+    number, bad = upload_all_users_id(data)
+    await message.answer(f'Успешно {number}, ошибок {bad}\n\nЗагружаю')
+    with open("all_users.xlsx", 'rb') as file:
+        await bot.send_document(chat_id=message.from_user.id, document=file, caption="Все сделано!")

@@ -32,7 +32,7 @@ def user_second_kb(cod_id=False):
 def start_admin_kb():
     create_post = InlineKeyboardButton(text='📝 Разсылка 📝', callback_data='admin_sender')
     my_bot = InlineKeyboardButton(text='📊 Статистика пользователей 📊', callback_data='admin_stat')
-    posts = InlineKeyboardButton(text='🎚 Настройки 🎚', callback_data='admin_setings')
+    posts = InlineKeyboardButton(text='⚙️ Настройки ⚙️', callback_data='admin_setings')
     inform = InlineKeyboardButton(text='👥 Зайти как user 👥', callback_data='admin_as_user')
     start_kb = InlineKeyboardMarkup().add(create_post)
     start_kb.add(my_bot)

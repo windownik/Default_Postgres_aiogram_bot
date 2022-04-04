@@ -5,18 +5,10 @@
       <option name="ignoredPackages">
         <value>
           <list size="2">
-            <item index="0" class="java.lang.String" itemvalue="schedule" />
+            <item index="0" class="java.lang.String" itemvalue="asyncio" />
             <item index="1" class="java.lang.String" itemvalue="aiogram" />
           </list>
         </value>
-      </option>
-    </inspection_tool>
-    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ignoredIdentifiers">
-        <list>
-          <option value="mail" />
-          <option value="str" />
-        </list>
       </option>
     </inspection_tool>
   </profile>
