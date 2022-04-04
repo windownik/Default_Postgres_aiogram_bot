@@ -10,7 +10,7 @@ Admin have default settings.
 
 Admin can start sending text, video, audio, messages for en/ru/all users.
 
-Admin can download all telegram id's by /users.
+Admin can download all telegram id's by command /users.
 
 Connection to postgresSQL.
 
