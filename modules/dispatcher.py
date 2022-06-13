@@ -1,9 +1,12 @@
+import logging
+
 from aiogram import Bot, Dispatcher
-from modules.setings import MainSettings
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-import logging
+from modules.setings import MainSettings
+from modules.my_filter import CheckActivityM
+
 
 constant = MainSettings()
 telegram_token = constant.tg_token()
@@ -15,11 +18,15 @@ bot = Bot(telegram_token)
 dp = Dispatcher(bot, storage=storage)
 
 
+# Включаем фильтры
+dp.filters_factory.bind(CheckActivityM)
+
+
 class Admin(StatesGroup):
     start = State()
 
 
-class Admin_sender(StatesGroup):
+class AdminSender(StatesGroup):
     new_text_post = State()
     new_media = State()
     new_k_board = State()
@@ -27,7 +34,7 @@ class Admin_sender(StatesGroup):
     confirm_sender = State()
 
 
-class User_Work(StatesGroup):
+class UserWork(StatesGroup):
     pick_category = State()
     pick_market = State()
     cod_status = State()

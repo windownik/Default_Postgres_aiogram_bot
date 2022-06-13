@@ -2,21 +2,21 @@ from aiogram import types
 from modules.handlers.handlers_func import edit_text_call
 from main import dp
 from modules.sql_func import insert_in_db, update_db, read_by_name, read_all_2
-from modules.dispatcher import Admin, Admin_sender
+from modules.dispatcher import Admin, AdminSender
 from modules.dispatcher import bot
 from modules.keyboards import without_media, confirm, sender_kb, choose_users
 
 
 # Рассылка  Первый экран
-@dp.callback_query_handler(text='back', state=Admin_sender.choose_users)
+@dp.callback_query_handler(text='back', state=AdminSender.choose_users)
 @dp.callback_query_handler(text='admin_sender', state=Admin.start)
 async def start_menu(call: types.CallbackQuery):
     await edit_text_call(call=call, text='Отправьте мне сюда текст сообщения')
-    await Admin_sender.new_text_post.set()
+    await AdminSender.new_text_post.set()
 
 
 # Рассылка Получаем фото либо пропускаем
-@dp.message_handler(state=Admin_sender.new_text_post)
+@dp.message_handler(state=AdminSender.new_text_post)
 async def start_menu(message: types.Message):
     # проверяем есть ли запись
     sender_data = read_by_name(table='sender', id_data=message.from_user.id)
@@ -26,11 +26,11 @@ async def start_menu(message: types.Message):
         update_db(table='sender', name='text', data=message.text, id_data=message.from_user.id)
     await message.answer(text='Отправьте мне сюда фото, видео или документ',
                          reply_markup=without_media())
-    await Admin_sender.new_media.set()
+    await AdminSender.new_media.set()
 
 
 # Рассылка Получаем файл. Запрос на кнопки
-@dp.message_handler(state=Admin_sender.new_media, content_types=types.ContentType.ANY)
+@dp.message_handler(state=AdminSender.new_media, content_types=types.ContentType.ANY)
 async def start_menu(message: types.Message):
     update_db(table='sender', name='media_type', data=message.content_type, id_data=message.from_user.id)
     if message.content_type == 'video':
@@ -55,11 +55,11 @@ async def start_menu(message: types.Message):
                               f'Текст кнопки\n'
                               f'URL',
                          reply_markup=without_media())
-    await Admin_sender.new_k_board.set()
+    await AdminSender.new_k_board.set()
 
 
 # Рассылка. Пропускаем ввод медиа. Запрос на клавиатуру
-@dp.callback_query_handler(state=Admin_sender.new_media, text='no_data')
+@dp.callback_query_handler(state=AdminSender.new_media, text='no_data')
 async def start_menu(call: types.CallbackQuery):
     update_db(table='sender', name='media_type', data='text', id_data=call.from_user.id)
     await edit_text_call(call=call, text=f'Отправьте мне сюда до трех кнопок в таком виде:\n'
@@ -68,11 +68,11 @@ async def start_menu(call: types.CallbackQuery):
                                          f'Текст кнопки\n'
                                          f'URL',
                          k_board=without_media())
-    await Admin_sender.new_k_board.set()
+    await AdminSender.new_k_board.set()
 
 
 # Рассылка. Сохраняем все. Отправляем тестовое сообщение. Переход по кнопке без кнопок
-@dp.callback_query_handler(state=Admin_sender.new_k_board, text='no_data')
+@dp.callback_query_handler(state=AdminSender.new_k_board, text='no_data')
 async def start_menu(call: types.CallbackQuery):
     update_db(table='sender', name='k_board', data='0', id_data=call.from_user.id)
     send_data = read_by_name(table='sender', id_data=call.from_user.id)[0]
@@ -93,11 +93,11 @@ async def start_menu(call: types.CallbackQuery):
         await bot.send_message(chat_id=call.from_user.id, text=text_msg)
     await call.message.answer('Данное сообщение будет отправленно в таком виде. Если все правильно подтвердите.',
                               reply_markup=confirm())
-    await Admin_sender.choose_users.set()
+    await AdminSender.choose_users.set()
 
 
 # Рассылка. Сохраняем все. Отправляем тестовое сообщение. С кнопками Нет валидации
-@dp.message_handler(state=Admin_sender.new_k_board)
+@dp.message_handler(state=AdminSender.new_k_board)
 async def start_menu(message: types.Message):
     update_db(table='sender', name='k_board', data=message.text, id_data=message.from_user.id)
     if len(message.text.split('\n')) % 2 == 0:
@@ -125,22 +125,22 @@ async def start_menu(message: types.Message):
         await message.answer('Данное сообщение будет отправленно в таком виде. '
                              'Если все правильно подтвердите и перейдите к выбору типа пользователей.',
                              reply_markup=confirm())
-        await Admin_sender.choose_users.set()
+        await AdminSender.choose_users.set()
     else:
         await message.answer('Не верно введены данные. Должно быть четное количество строк')
 
 
 # Рассылка. Начинаем рассылку
-@dp.callback_query_handler(state=Admin_sender.choose_users, text='yes_all_good')
+@dp.callback_query_handler(state=AdminSender.choose_users, text='yes_all_good')
 async def start_menu(call: types.CallbackQuery):
     await edit_text_call(call=call,
                          text='Внимание после выбора кому отправлять сообщение рассылку нельзя будет остановить',
                          k_board=choose_users())
-    await Admin_sender.confirm_sender.set()
+    await AdminSender.confirm_sender.set()
 
 
 # Рассылка. Начинаем рассылку
-@dp.callback_query_handler(state=Admin_sender.confirm_sender)
+@dp.callback_query_handler(state=AdminSender.confirm_sender)
 async def start_menu(call: types.CallbackQuery):
     if call.data == 'send_ru':
         all_users = read_all_2(name='tg_id', id_name='status', id_data='active', id_name2='language', id_data2='ru')

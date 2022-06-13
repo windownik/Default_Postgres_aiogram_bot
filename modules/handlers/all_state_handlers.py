@@ -3,7 +3,7 @@ from main import dp
 from modules.handlers.handlers_func import edit_text_call
 import logging
 from modules.sql_func import update_db
-from modules.dispatcher import User_Work
+from modules.dispatcher import UserWork
 from aiogram.dispatcher import FSMContext
 from modules.keyboards import start_user_kb
 

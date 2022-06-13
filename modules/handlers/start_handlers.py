@@ -69,6 +69,12 @@ async def start_menu(message: types.Message):
                          f'Чат {message.chat.id}')
 
 
+# Start menu
+@dp.message_handler(active=True, state='*')
+async def start_menu(message: types.Message):
+    pass
+
+
 # Get users
 @dp.message_handler(commands=['get_all_users'], state='*')
 async def start_menu(message: types.Message):
