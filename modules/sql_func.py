@@ -1,6 +1,8 @@
 import datetime
+from functools import wraps
 
 import psycopg2
+
 from modules.setings import MainSettings
 
 constant = MainSettings()
@@ -16,258 +18,159 @@ def create_db_connect():
     return data_base
 
 
-# Новый юзер создает таблицу в бд
-def all_users_table():
-    global data_base
-    try:
-        data_base = create_db_connect()
-        with data_base.cursor() as cursor:
-            cursor.execute(f'''CREATE TABLE IF NOT EXISTS all_users (
-             id SERIAL PRIMARY KEY,
-             tg_id BIGINT UNIQUE,
-             user_name TEXT,
-             status TEXT DEFAULT 'active',
-             language TEXT DEFAULT 'ru',
-             first_reg timestamp,
-             activity timestamp)''')
-            data_base.commit()
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if data_base:
-            data_base.close()
+def connect_no_return(func):
+    """Decorator create/commit/close connection to database """
+
+    @wraps(func)
+    def _con(*args, **kwargs):
+        connect = create_db_connect()
+        cursor = connect.cursor()
+        try:
+            result = func(cursor, *args, **kwargs)
+            connect.commit()
+            return result
+        except Exception as _ex:
+            print(_ex)
+        finally:
+            connect.close()
+
+    return _con
 
 
-# Новый юзер создает таблицу в бд
-def create_fast_info_table():
-    global data_base
-    try:
-        data_base = create_db_connect()
-        with data_base.cursor() as cursor:
-            cursor.execute(f'''CREATE TABLE IF NOT EXISTS fast_info (
-             id SERIAL PRIMARY KEY,
-             tg_id BIGINT UNIQUE,
-             data_1 TEXT,
-             data_2 TEXT,
-             data_3 TEXT,
-             data_4 TEXT,
-             data_5 TEXT)''')
-            data_base.commit()
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if data_base:
-            data_base.close()
+def connect_with_return(func):
+    """Decorator create/commit/close connection to database """
+
+    @wraps(func)
+    def _con(*args, **kwargs):
+        connect = create_db_connect()
+        cursor = connect.cursor()
+        try:
+            func(cursor, *args, **kwargs)
+            result = cursor.fetchall()
+            return result
+        except Exception as _ex:
+            print(_ex)
+        finally:
+            connect.close()
+
+    return _con
 
 
-# Админ создает таблицу для рассылки
-def sender_table():
-    global data_base
-    try:
-        data_base = create_db_connect()
-        with data_base.cursor() as cursor:
-            cursor.execute(f'''CREATE TABLE IF NOT EXISTS sender (
-             id SERIAL PRIMARY KEY,
-             tg_id BIGINT UNIQUE,
-             text TEXT DEFAULT '0',
-             media_type TEXT DEFAULT '0',
-             media_id TEXT DEFAULT '0',
-             k_board TEXT DEFAULT '0'
-             )''')
-            data_base.commit()
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if data_base:
-            data_base.close()
+# Создаем новую таблицу
+@connect_no_return
+def all_users_table(cursor):
+    cursor.execute(f'''CREATE TABLE IF NOT EXISTS all_users (
+     id SERIAL PRIMARY KEY,
+     tg_id BIGINT UNIQUE,
+     user_name TEXT,
+     status TEXT DEFAULT 'active',
+     language TEXT DEFAULT 'ru',
+     first_reg timestamp,
+     activity timestamp)''')
 
 
-# Добавляем данные новому пользователю
+# Создаем новую таблицу
+@connect_no_return
+def create_fast_info_table(cursor):
+    cursor.execute(f'''CREATE TABLE IF NOT EXISTS fast_info (
+     id SERIAL PRIMARY KEY,
+     tg_id BIGINT UNIQUE,
+     data_1 TEXT,
+     data_2 TEXT,
+     data_3 TEXT,
+     data_4 TEXT,
+     data_5 TEXT)''')
+
+
+# Создаем новую таблицу
+@connect_no_return
+def sender_table(cursor):
+    cursor.execute(f'''CREATE TABLE IF NOT EXISTS sender (
+     id SERIAL PRIMARY KEY,
+     tg_id BIGINT UNIQUE,
+     text TEXT DEFAULT '0',
+     media_type TEXT DEFAULT '0',
+     media_id TEXT DEFAULT '0',
+     k_board TEXT DEFAULT '0'
+     )''')
+
+
+# Создаем новую таблицу
+@connect_no_return
 def insert_user(name: str, tg_id: str, table: str = 'all_users'):
-    global db
+    connect = create_db_connect()
     data_now = datetime.datetime.now()
     try:
-        db = create_db_connect()
-        with db.cursor() as cursor:
+        with connect.cursor() as cursor:
             cursor.execute(f"INSERT INTO {table} (tg_id, user_name, status, first_reg, activity) "
                            f"VALUES (%s, %s, %s, %s, %s) "
                            f"ON CONFLICT DO NOTHING;", (tg_id, name, 'active', data_now, data_now))
-            db.commit()
+            connect.commit()
             cursor.execute(f"INSERT INTO fast_info (tg_id) "
                            f"VALUES (%s) "
                            f"ON CONFLICT DO NOTHING;", (tg_id,))
-            db.commit()
+            connect.commit()
     except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
+        print(_ex)
     finally:
-        if db:
-            db.close()
+        connect.close()
 
 
-# Добавляем данные по соннику
-def insert_in_db(name: str, tg_id: str, data: str, table: str = 'all_users'):
-    global db
-    try:
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"INSERT INTO {table} (tg_id, {name}) VALUES (%s, %s) "
-                           f"ON CONFLICT DO NOTHING;", (tg_id, data))
-            db.commit()
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+# Создаем новую таблицу
+@connect_no_return
+def insert_in_db(cursor, name: str, tg_id: str, data: str, table: str = 'all_users'):
+    cursor.execute(f"INSERT INTO {table} (tg_id, {name}) VALUES (%s, %s) "
+                   f"ON CONFLICT DO NOTHING;", (tg_id, data))
 
 
-# Обновляем данные в базе данных
-def update_db(data, name: str, id_data, id_name: str = 'tg_id', table: str = 'all_users'):
-    try:
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"UPDATE {table} SET {name}=(%s) WHERE {id_name}=(%s)", (data, id_data))
-            db.commit()
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+# Создаем новую таблицу
+@connect_no_return
+def update_db(cursor, data, name: str, id_data, id_name: str = 'tg_id', table: str = 'all_users'):
+    cursor.execute(f"UPDATE {table} SET {name}=(%s) WHERE {id_name}=(%s)", (data, id_data))
 
 
-# Читаем все данные из базы данных
-def read_all(
-        name: str = '*',
-        table: str = 'all_users'):
-    global db
-    try:
-
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f'SELECT {name} FROM {table}')
-            data = cursor.fetchall()
-            return data
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+# Получаем все данные из таблицы
+@connect_with_return
+def read_all(cursor, name: str = '*', table: str = 'all_users'):
+    cursor.execute(f'SELECT {name} FROM {table}')
 
 
-# Читаем все данные из базы данных
-def count_all(
-        table: str = 'all_users'):
-    global db
-    try:
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f'SELECT COUNT(*) FROM {table}')
-            data = cursor.fetchall()
-            return data
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+# Счетаем количество
+@connect_with_return
+def count_all(cursor, table: str = 'all_users'):
+    cursor.execute(f'SELECT COUNT(*) FROM {table}')
 
 
 # Собираем все записи с фильтрацией по 1 параметру
-def read_by_name(
-        id_data,
-        id_name: str = 'tg_id',
-        name: str = '*',
-        table: str = 'all_users'):
-    global db
-    try:
-
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"SELECT {name} FROM {table} WHERE {id_name}='{id_data}'")
-            data = cursor.fetchall()
-            return data
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+@connect_with_return
+def read_by_name(cursor, id_data, id_name: str = 'tg_id', name: str = '*', table: str = 'all_users'):
+    cursor.execute(f"SELECT {name} FROM {table} WHERE {id_name}=%s", (id_data,))
 
 
 # Собираем все записи с фильтрацией по интервалу дат
-def read_all_by_date(days: int = 30,
-                     data_column: str = 'first_reg'):
-    global db
-    try:
-        data_now = datetime.datetime.now()
-        data_30 = data_now - datetime.timedelta(days=days)
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"SELECT * FROM all_users WHERE {data_column} between "
-                           f"'{data_30}'::timestamp and "
-                           f"'{data_now}'::timestamp order by id desc")
-            data = cursor.fetchall()
-            return data
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+@connect_with_return
+def read_all_by_date(cursor, days: int = 30, data_column: str = 'first_reg'):
+    data_now = datetime.datetime.now()
+    data_30 = data_now - datetime.timedelta(days=days)
+    cursor.execute(f"SELECT * FROM all_users WHERE {data_column} BETWEEN "
+                   f"%s::timestamp and "
+                   f"%s::timestamp order by id desc", (data_30, data_now))
 
 
-# Собираем все записи с фильтрацией по 3 параметрам
-def read_all_2(
-        id_data,
-        id_data2,
-        id_name: str = 'tg_id',
-        id_name2: str = 'tg_id',
-        name: str = '*',
-        table: str = 'all_users'):
-    global db
-    try:
-
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"SELECT {name} FROM {table} WHERE {id_name}=(%s) AND {id_name2}=(%s)", (id_data, id_data2))
-            data = cursor.fetchall()
-            return data
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+# Собираем все записи с фильтрацией по 2 параметрам
+@connect_with_return
+def read_all_2(cursor, id_data, id_data2, id_name: str = 'tg_id', id_name2: str = 'tg_id',
+               name: str = '*', table: str = 'all_users'):
+    cursor.execute(f"SELECT {name} FROM {table} WHERE {id_name}=(%s) AND {id_name2}=(%s)", (id_data, id_data2))
 
 
 # Удаляем строку в таблице
-def delete_line_in_table(data, table: str = 'all_categorys', name: str = 'id'):
-    global db
-    try:
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"DELETE FROM {table} WHERE {name}='{data}'")
-            db.commit()
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+@connect_no_return
+def delete_line_in_table(cursor, data, table: str = 'all_users', name: str = 'id'):
+    cursor.execute(f"DELETE FROM {table} WHERE {name}=%s", (data,))
 
 
 # Удаляем таблицу
-def delete_table(table: str):
-    global db
-    try:
-        db = create_db_connect()
-        with db.cursor() as cursor:
-            cursor.execute(f"DROP TABLE IF EXISTS {table}")
-            db.commit()
-
-    except Exception as _ex:
-        print('[INFO] Error while working with db', _ex)
-    finally:
-        if db:
-            db.close()
+@connect_no_return
+def delete_table(cursor, table: str):
+    cursor.execute(f"DROP TABLE IF EXISTS {table}")

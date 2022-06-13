@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="771c6cd3-4bff-40ed-82a8-5b5e1d1c7914" name="Changes" comment="Add download all users&#10;And download all id users">
+    <list default="true" id="771c6cd3-4bff-40ed-82a8-5b5e1d1c7914" name="Changes" comment="Add update activity filter">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/sql_func.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/sql_func.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +35,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Free_lanc/GIT/bot_casino_postgres" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -80,7 +81,21 @@
       <option name="project" value="LOCAL" />
       <updated>1649079488287</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Add update activity filter">
+      <created>1655122303048</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1655122303048</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add update activity filter">
+      <created>1655122374860</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1655122374860</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -96,6 +111,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add download all users&#10;And download all id users" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add download all users&#10;And download all id users" />
+    <MESSAGE value="Add update activity filter" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add update activity filter" />
   </component>
 </project>
