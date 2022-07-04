@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="771c6cd3-4bff-40ed-82a8-5b5e1d1c7914" name="Changes" comment="Add update activity filter">
+    <list default="true" id="771c6cd3-4bff-40ed-82a8-5b5e1d1c7914" name="Changes" comment="Rework sql file">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_sender.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_stat.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_stat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/all_state_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/all_state_handlers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/start_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/start_handlers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/sql_func.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/sql_func.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -22,6 +26,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -95,7 +107,14 @@
       <option name="project" value="LOCAL" />
       <updated>1655122374860</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Rework sql file">
+      <created>1655126609845</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1655126609845</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -112,6 +131,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add download all users&#10;And download all id users" />
     <MESSAGE value="Add update activity filter" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add update activity filter" />
+    <MESSAGE value="Rework sql file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rework sql file" />
   </component>
 </project>

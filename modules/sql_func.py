@@ -1,3 +1,5 @@
+import asyncio
+import asyncpg
 import datetime
 from functools import wraps
 
@@ -97,80 +99,71 @@ def sender_table(cursor):
 
 # Создаем новую таблицу
 @connect_no_return
-def insert_user(name: str, tg_id: str, table: str = 'all_users'):
-    connect = create_db_connect()
-    data_now = datetime.datetime.now()
-    try:
-        with connect.cursor() as cursor:
-            cursor.execute(f"INSERT INTO {table} (tg_id, user_name, status, first_reg, activity) "
-                           f"VALUES (%s, %s, %s, %s, %s) "
-                           f"ON CONFLICT DO NOTHING;", (tg_id, name, 'active', data_now, data_now))
-            connect.commit()
-            cursor.execute(f"INSERT INTO fast_info (tg_id) "
-                           f"VALUES (%s) "
-                           f"ON CONFLICT DO NOTHING;", (tg_id,))
-            connect.commit()
-    except Exception as _ex:
-        print(_ex)
-    finally:
-        connect.close()
+class Database:
+    def __init__(self, loop: asyncio.AbstractEventLoop):
+        self.cursor = loop.run_until_complete(
+            asyncpg.create_pool(
+                host=constant.db_host(),
+                user=constant.user_db(),
+                password=constant.password_db(),
+                database=constant.db_name(),
+                port=5432
+            )
+        )
+
+    async def insert_user(self, name: str, tg_id: str, table: str = 'all_users'):
+        data_now = datetime.datetime.now()
+        await self.cursor.execute(f"INSERT INTO {table} (tg_id, user_name, status, first_reg, activity) "
+                                  f"VALUES ($1, $2, $3, $4, $5) "
+                                  f"ON CONFLICT DO NOTHING;", tg_id, name, 'active', data_now, data_now)
+
+        await self.cursor.execute(f"INSERT INTO fast_info (tg_id) "
+                                  f"VALUES ($1) "
+                                  f"ON CONFLICT DO NOTHING;", tg_id)
+
+    # Создаем новую таблицу
+    async def insert_in_db(self, name: str, tg_id: str, data: str, table: str = 'all_users'):
+        await self.cursor.execute(f"INSERT INTO {table} (tg_id, {name}) VALUES ($1, $2) "
+                                  f"ON CONFLICT DO NOTHING;", tg_id, data)
+
+    # Создаем новую таблицу
+    async def update_db(self, data, name: str, id_data, id_name: str = 'tg_id', table: str = 'all_users'):
+        await self.cursor.execute(f"UPDATE {table} SET {name}=($1) WHERE {id_name}=($2)", data, id_data)
+
+    # Получаем все данные из таблицы
+    async def read_all(self, name: str = '*', table: str = 'all_users'):
+        await self.cursor.fetch(f'SELECT {name} FROM {table}')
+
+    # Счетаем количество
+    async def count_all(self, table: str = 'all_users'):
+        await self.cursor.fetch(f'SELECT COUNT(*) FROM {table}')
+
+    # Собираем все записи с фильтрацией по 1 параметру
+    async def read_by_name(self, id_data, id_name: str = 'tg_id', name: str = '*', table: str = 'all_users'):
+        await self.cursor.fetch(f"SELECT {name} FROM {table} WHERE {id_name}=$1", id_data)
+
+    # Собираем все записи с фильтрацией по интервалу дат
+    async def read_all_by_date(self, days: int = 30, data_column: str = 'first_reg'):
+        data_now = datetime.datetime.now()
+        data_30 = data_now - datetime.timedelta(days=days)
+        await self.cursor.fetch(f"SELECT * FROM all_users WHERE {data_column} BETWEEN "
+                                f"$1::timestamp and "
+                                f"$2::timestamp order by id desc", data_30, data_now)
+
+    # Собираем все записи с фильтрацией по 2 параметрам
+    async def read_all_2(self, id_data, id_data2, id_name: str = 'tg_id', id_name2: str = 'tg_id',
+                         name: str = '*', table: str = 'all_users'):
+        await self.cursor.fetch(f"SELECT {name} FROM {table} WHERE {id_name}=($1) AND {id_name2}=($2)", id_data,
+                                id_data2)
+
+    # Удаляем строку в таблице
+    async def delete_line_in_table(self, data, table: str = 'all_users', name: str = 'id'):
+        await self.cursor.execute(f"DELETE FROM {table} WHERE {name}=$1", data)
+
+    # Удаляем таблицу
+    async def delete_table(self, table: str):
+        await self.cursor.execute(f"DROP TABLE IF EXISTS {table}")
 
 
-# Создаем новую таблицу
-@connect_no_return
-def insert_in_db(cursor, name: str, tg_id: str, data: str, table: str = 'all_users'):
-    cursor.execute(f"INSERT INTO {table} (tg_id, {name}) VALUES (%s, %s) "
-                   f"ON CONFLICT DO NOTHING;", (tg_id, data))
-
-
-# Создаем новую таблицу
-@connect_no_return
-def update_db(cursor, data, name: str, id_data, id_name: str = 'tg_id', table: str = 'all_users'):
-    cursor.execute(f"UPDATE {table} SET {name}=(%s) WHERE {id_name}=(%s)", (data, id_data))
-
-
-# Получаем все данные из таблицы
-@connect_with_return
-def read_all(cursor, name: str = '*', table: str = 'all_users'):
-    cursor.execute(f'SELECT {name} FROM {table}')
-
-
-# Счетаем количество
-@connect_with_return
-def count_all(cursor, table: str = 'all_users'):
-    cursor.execute(f'SELECT COUNT(*) FROM {table}')
-
-
-# Собираем все записи с фильтрацией по 1 параметру
-@connect_with_return
-def read_by_name(cursor, id_data, id_name: str = 'tg_id', name: str = '*', table: str = 'all_users'):
-    cursor.execute(f"SELECT {name} FROM {table} WHERE {id_name}=%s", (id_data,))
-
-
-# Собираем все записи с фильтрацией по интервалу дат
-@connect_with_return
-def read_all_by_date(cursor, days: int = 30, data_column: str = 'first_reg'):
-    data_now = datetime.datetime.now()
-    data_30 = data_now - datetime.timedelta(days=days)
-    cursor.execute(f"SELECT * FROM all_users WHERE {data_column} BETWEEN "
-                   f"%s::timestamp and "
-                   f"%s::timestamp order by id desc", (data_30, data_now))
-
-
-# Собираем все записи с фильтрацией по 2 параметрам
-@connect_with_return
-def read_all_2(cursor, id_data, id_data2, id_name: str = 'tg_id', id_name2: str = 'tg_id',
-               name: str = '*', table: str = 'all_users'):
-    cursor.execute(f"SELECT {name} FROM {table} WHERE {id_name}=(%s) AND {id_name2}=(%s)", (id_data, id_data2))
-
-
-# Удаляем строку в таблице
-@connect_no_return
-def delete_line_in_table(cursor, data, table: str = 'all_users', name: str = 'id'):
-    cursor.execute(f"DELETE FROM {table} WHERE {name}=%s", (data,))
-
-
-# Удаляем таблицу
-@connect_no_return
-def delete_table(cursor, table: str):
-    cursor.execute(f"DROP TABLE IF EXISTS {table}")
+loop = asyncio.get_event_loop()
+data_b = Database(loop)
