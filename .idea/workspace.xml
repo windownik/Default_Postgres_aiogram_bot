@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="771c6cd3-4bff-40ed-82a8-5b5e1d1c7914" name="Changes" comment="Rework sql file">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_sender.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_stat.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_stat.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/handlers/all_state_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/all_state_handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/handlers/start_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/start_handlers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/sql_func.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/sql_func.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/token.json" beforeDir="false" afterPath="$PROJECT_DIR$/modules/token.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +111,21 @@
       <option name="project" value="LOCAL" />
       <updated>1655126609845</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Rework sql file">
+      <created>1656967995141</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1656967995141</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Rework sql file">
+      <created>1656968379970</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1656968379970</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

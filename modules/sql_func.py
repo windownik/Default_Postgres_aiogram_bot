@@ -98,7 +98,6 @@ def sender_table(cursor):
 
 
 # Создаем новую таблицу
-@connect_no_return
 class Database:
     def __init__(self, loop: asyncio.AbstractEventLoop):
         self.cursor = loop.run_until_complete(
