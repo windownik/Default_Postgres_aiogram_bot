@@ -8,7 +8,7 @@ from modules.dispatcher import Admin
 from modules.sql_func import data_b
 
 
-def create_stat_text():
+async def create_stat_text():
     all_users = (await data_b.count_all())[0][0]
     all_users_ru = len(await data_b.read_by_name(name='id', id_name='language', id_data='ru'))
     all_users_en = len(await data_b.read_by_name(name='id', id_name='language', id_data='en'))
@@ -29,4 +29,4 @@ def create_stat_text():
 
 @dp.callback_query_handler(state=Admin.start, text='admin_stat')
 async def start_menu(call: types.CallbackQuery):
-    await edit_text_call(call=call, text=create_stat_text())
+    await edit_text_call(call=call, text=await create_stat_text())

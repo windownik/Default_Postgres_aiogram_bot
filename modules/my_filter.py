@@ -2,8 +2,9 @@
 import datetime
 
 from aiogram import types
-from modules.sql_func import update_db
 from aiogram.dispatcher.filters import BoundFilter
+
+from modules.sql_func import data_b
 
 
 class CheckActivityM(BoundFilter):
@@ -15,7 +16,7 @@ class CheckActivityM(BoundFilter):
     async def check(self, message: types.Message):
         try:
             now = datetime.datetime.now()
-            update_db(table="all_users", name="activity", data=now, id_data=message.from_user.id)
+            await data_b.update_db(table="all_users", name="activity", data=now, id_data=message.from_user.id)
             return False
         except Exception as _ex:
             print(_ex)
