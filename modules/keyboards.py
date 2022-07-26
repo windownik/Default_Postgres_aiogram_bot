@@ -8,12 +8,18 @@ send_contact_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(send_contact)
 
 
 def start_user_kb():
-    ru_lang = InlineKeyboardButton(text='🇷🇺 Русский', callback_data='ru_lang')
-    en_lang = InlineKeyboardButton(text='🇺🇸 English', callback_data='en_lang')
+    sex_female = InlineKeyboardButton(text='🙍‍♀️ Девушка', callback_data='sex_female')
+    sex_men = InlineKeyboardButton(text='🙎‍♂️ Парень', callback_data='sex_men')
     start_kb = InlineKeyboardMarkup()
-    start_kb.add(ru_lang)
-    start_kb.add(en_lang)
+    start_kb.add(sex_men, sex_female)
     return start_kb
+
+
+# клавиатура для админа стартовая
+def back_kb_():
+    back = InlineKeyboardButton(text=f'🔙 Назад', callback_data=f'back')
+    user_main = InlineKeyboardMarkup()
+    return user_main.add(back)
 
 
 def user_second_kb(cod_id=False):
@@ -33,11 +39,25 @@ def start_admin_kb():
     create_post = InlineKeyboardButton(text='📝 Разсылка 📝', callback_data='admin_sender')
     my_bot = InlineKeyboardButton(text='📊 Статистика пользователей 📊', callback_data='admin_stat')
     posts = InlineKeyboardButton(text='⚙️ Настройки ⚙️', callback_data='admin_setings')
+    reff = InlineKeyboardButton(text='👥 Реферальные ссылки 👥', callback_data='admin_reff')
     inform = InlineKeyboardButton(text='👥 Зайти как user 👥', callback_data='admin_as_user')
     start_kb = InlineKeyboardMarkup().add(create_post)
     start_kb.add(my_bot)
     start_kb.add(posts)
     start_kb.add(inform)
+    start_kb.add(reff)
+    return start_kb
+
+
+def special_reffs(without_list: bool = False):
+    reff_list = InlineKeyboardButton(text='📝 список всех ID ссылок', callback_data='reff_list')
+    check_reff_id = InlineKeyboardButton(text='📊 Получить статистику по рефф ID', callback_data='check_reff_id')
+    back = InlineKeyboardButton(text=f'🔙 Назад', callback_data=f'back')
+    start_kb = InlineKeyboardMarkup()
+    if not without_list:
+        start_kb.add(reff_list)
+    start_kb.add(check_reff_id)
+    start_kb.add(back)
     return start_kb
 
 
@@ -62,8 +82,8 @@ def confirm():
 # клавиатура для админа стартовая
 def choose_users():
     send_all = InlineKeyboardButton(text=f'Вообще всем', callback_data=f'send_all')
-    send_en = InlineKeyboardButton(text=f'Все англоговорящие', callback_data=f'send_en')
-    send_ru = InlineKeyboardButton(text=f'Все русскоговорящие', callback_data=f'send_ru')
+    send_en = InlineKeyboardButton(text=f'Всем парням', callback_data=f'send_men')
+    send_ru = InlineKeyboardButton(text=f'Всем девушкам', callback_data=f'send_female')
     back = InlineKeyboardButton(text=f'🔙 Назад', callback_data=f'back')
     user_main = InlineKeyboardMarkup()
     user_main.add(send_all)

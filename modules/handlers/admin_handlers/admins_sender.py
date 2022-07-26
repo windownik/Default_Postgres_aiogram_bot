@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram import types
 from modules.handlers.handlers_func import edit_text_call
 from main import dp
@@ -145,16 +147,16 @@ async def start_menu(call: types.CallbackQuery):
 # Рассылка. Начинаем рассылку
 @dp.callback_query_handler(state=AdminSender.confirm_sender)
 async def start_menu(call: types.CallbackQuery):
-    if call.data == 'send_ru':
-        all_users = await data_b.read_all_2(name='tg_id', id_name='status', id_data='active', id_name2='language',
-                                            id_data2='ru')
-    elif call.data == 'send_en':
-        all_users = await data_b.read_all_2(name='tg_id', id_name='status', id_data='active', id_name2='language',
-                                            id_data2='en')
+    if call.data == 'send_men':
+        all_users = await data_b.read_all_sender(id_name='sex', id_data='men', name='tg_id')
+        key = 'Всем Парням'
+    elif call.data == 'send_female':
+        all_users = await data_b.read_all_sender(id_name='sex', id_data='female', name='tg_id')
+        key = 'Всем Девушкам'
     else:
-        all_users = await data_b.read_by_name(name='tg_id', id_name='status', id_data='active')
+        all_users = await data_b.read_by_name(id_name='status!', id_data='close', name='tg_id')
+        key = 'Вообще Всем'
 
-    await call.message.answer('Начинаю рассылку')
     send_data = (await data_b.read_by_name(table='sender', id_data=call.from_user.id))[0]
     text_msg = send_data[2]
     type_msg = send_data[3]
@@ -162,48 +164,143 @@ async def start_menu(call: types.CallbackQuery):
     kb_data = send_data[5]
     good = 0
     bad = 0
-    for one_id in all_users:
-        one_id = one_id[0]
+    all_number = len(all_users)
+    mess = await call.message.answer(f'<b>Рассылка: {key}</b>\n\n'
+                                     '⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀ 0%\n\n'
+                                     'Рассылка в работе\n'
+                                     f'На момент запуска: {all_number}\n'
+                                     f'✓ Успешно: 0\n'
+                                     f'✕ Блокировали: 0\n'
+                                     f'Скорость: ~/сек', parse_mode='html')
+    start = datetime.datetime.now()
+    try:
+        for one_id in all_users:
+            one_id = one_id[0]
+            try:
+                await send_for_all_users(type_msg=type_msg, kb_data=kb_data, one_id=one_id, text_msg=text_msg,
+                                         media_id=media_id)
+                good += 1
+            except:
+                await data_b.update_db(table="all_users", name="status", data="close", id_data=one_id)
+                bad += 1
+            await sender_text(good=good, bad=bad, all_number=all_number, mess_id=mess.message_id,
+                              chat_id=call.message.chat.id, key=key, start=start)
+
+        await bot.edit_message_text(text=f'<b>Рассылка: {key}</b>\n\n'
+                                         '********** 100%\n\n'
+                                         'Рассылка Завершена Успешно\n'
+                                         f'На момент запуска: {all_number}\n'
+                                         f'✓ Успешно: {good}\n'
+                                         f'✕ Блокировали: {bad}\n'
+                                         f'Скорость: {_speed(start, all_number)}/сек\n',
+                                    chat_id=call.message.chat.id, message_id=mess.message_id, parse_mode='html')
+    except:
+        await bot.send_message(text=f'<b>Рассылка: {key}</b>\n\n'
+                                    'Рассылка Прекращена аварийно!\n'
+                                    f'На момент запуска: {all_number}\n'
+                                    f'✓ Успешно: {good}\n'
+                                    f'✕ Блокировали: {bad}\n',
+                               chat_id=call.message.chat.id, parse_mode='html')
+
+
+# Отправляем сообщение для каждого пользователя
+async def send_for_all_users(type_msg: str, kb_data, one_id: int, text_msg: str, media_id: str):
+    if type_msg == 'photo':
+        if kb_data == '0':
+            await bot.send_photo(chat_id=one_id, photo=media_id, caption=text_msg)
+        else:
+            await bot.send_photo(chat_id=one_id, photo=media_id, caption=text_msg,
+                                 reply_markup=sender_kb(kb_data))
+    elif type_msg == 'video':
+        if kb_data == '0':
+            await bot.send_video(chat_id=one_id, video=media_id, caption=text_msg)
+        else:
+            await bot.send_video(chat_id=one_id, video=media_id, caption=text_msg,
+                                 reply_markup=sender_kb(kb_data))
+    elif type_msg == 'audio':
+        if kb_data == '0':
+            await bot.send_audio(chat_id=one_id, audio=media_id, caption=text_msg)
+        else:
+            await bot.send_audio(chat_id=one_id, audio=media_id, caption=text_msg,
+                                 reply_markup=sender_kb(kb_data))
+    elif type_msg == 'animation':
+        if kb_data == '0':
+            await bot.send_animation(chat_id=one_id, animation=media_id, caption=text_msg)
+        else:
+            await bot.send_animation(chat_id=one_id, animation=media_id, caption=text_msg,
+                                     reply_markup=sender_kb(kb_data))
+    elif type_msg == 'document':
+        if kb_data == '0':
+            await bot.send_document(chat_id=one_id, document=media_id, caption=text_msg)
+        else:
+            await bot.send_document(chat_id=one_id, document=media_id, caption=text_msg,
+                                    reply_markup=sender_kb(kb_data))
+    elif type_msg == 'text':
+        if kb_data == '0':
+            await bot.send_message(chat_id=one_id, text=text_msg)
+        else:
+            await bot.send_message(chat_id=one_id, text=text_msg, reply_markup=sender_kb(kb_data))
+
+
+async def sender_text(good: int, bad: int, all_number: int, mess_id: int, chat_id: int, key: str,
+                      start: datetime.datetime):
+    send_number = good + bad
+    if all_number < 3000:
+        if int(all_number / 2) == send_number:
+            await bot.edit_message_text(text=f'<b>Рассылка: {key}</b>\n\n'
+                                             '*****⣀⣀⣀⣀⣀ 50%\n\n'
+                                             'Рассылка в работе\n'
+                                             f'На момент запуска: {all_number}\n'
+                                             f'✓ Успешно: {good}\n'
+                                             f'✕ Блокировали: {bad}\n'
+                                             f'Скорость: {_speed(start, send_number)}/сек\n',
+                                        chat_id=chat_id, message_id=mess_id, parse_mode='html')
+        elif all_number == send_number:
+            await bot.edit_message_text(text=f'<b>Рассылка: {key}</b>\n\n'
+                                             '********** 100%\n\n'
+                                             'Рассылка в работе\n'
+                                             f'На момент запуска: {all_number}\n'
+                                             f'✓ Успешно: {good}\n'
+                                             f'✕ Блокировали: {bad}\n'
+                                             f'Скорость: {_speed(start, send_number)}/сек\n',
+                                        chat_id=chat_id, message_id=mess_id, parse_mode='html')
+
+    if send_number % 500 == 0:
+        text = f'<b>Рассылка: {key}</b>\n\n' \
+               f'{_percent(all_number=all_number, now_number=send_number)}%\n\n' \
+               'Рассылка в работе\n' \
+               f'На момент запуска: {all_number}\n' \
+               f'✓ Успешно: {good}\n' \
+               f'✕ Блокировали: {bad}\n' \
+               f'Скорость: {_speed(start, send_number)}/сек\n'
         try:
-            if type_msg == 'photo':
-                if kb_data == '0':
-                    await bot.send_photo(chat_id=one_id, photo=media_id, caption=text_msg)
-                else:
-                    await bot.send_photo(chat_id=one_id, photo=media_id, caption=text_msg,
-                                         reply_markup=sender_kb(kb_data))
-            elif type_msg == 'video':
-                if kb_data == '0':
-                    await bot.send_video(chat_id=one_id, video=media_id, caption=text_msg)
-                else:
-                    await bot.send_video(chat_id=one_id, video=media_id, caption=text_msg,
-                                         reply_markup=sender_kb(kb_data))
-            elif type_msg == 'audio':
-                if kb_data == '0':
-                    await bot.send_audio(chat_id=one_id, audio=media_id, caption=text_msg)
-                else:
-                    await bot.send_audio(chat_id=one_id, audio=media_id, caption=text_msg,
-                                         reply_markup=sender_kb(kb_data))
-            elif type_msg == 'animation':
-                if kb_data == '0':
-                    await bot.send_animation(chat_id=one_id, animation=media_id, caption=text_msg)
-                else:
-                    await bot.send_animation(chat_id=one_id, animation=media_id, caption=text_msg,
-                                             reply_markup=sender_kb(kb_data))
-            elif type_msg == 'document':
-                if kb_data == '0':
-                    await bot.send_document(chat_id=one_id, document=media_id, caption=text_msg)
-                else:
-                    await bot.send_document(chat_id=one_id, document=media_id, caption=text_msg,
-                                            reply_markup=sender_kb(kb_data))
-            elif type_msg == 'text':
-                if kb_data == '0':
-                    await bot.send_message(chat_id=one_id, text=text_msg)
-                else:
-                    await bot.send_message(chat_id=one_id, text=text_msg, reply_markup=sender_kb(kb_data))
-            good += 1
+            await bot.edit_message_text(text=text, chat_id=chat_id, parse_mode='html',
+                                        message_id=mess_id)
         except Exception as _ex:
-            await data_b.update_db(table="all_users", name="status", data="close", id_data=one_id)
-            bad += 1
-    await call.message.answer(f'Закончил рассылку\n'
-                              f'успешно: {good}\n'
-                              f'неудачно: {bad}')
+            print(text)
+            print('MORE 3000 ERROR  ', _ex)
+
+
+def delta_hours(start: datetime.datetime) -> str:
+    duration = datetime.datetime.now() - start
+    seconds = duration.seconds
+    hours = seconds // 3600
+    duration = seconds % 3600
+    minutes = duration // 60
+    return f'~{hours} ч.{minutes}мин.'
+
+
+def _speed(start: datetime.datetime, now_number: int) -> int:
+    duration = datetime.datetime.now() - start
+    seconds = duration.seconds
+    if seconds == 0:
+        seconds = 1
+    speed = now_number // seconds
+    return speed
+
+
+def _percent(all_number: int, now_number: int) -> str:
+    percent = int((now_number * 100) // all_number)
+    graph = int(percent // 10) * '*'
+    blank = (10 - int(percent / 10)) * '⣀'
+    return f'{graph}{blank} {percent}'

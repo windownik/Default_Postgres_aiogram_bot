@@ -8,8 +8,8 @@ from modules.sql_func import data_b
 @dp.callback_query_handler(state='*')
 async def start_menu(call: types.CallbackQuery):
     call_text = call.data
-    if call_text == 'ru_lang':
-        await edit_text_call(call, "Вы выбрали русский язык")
-    elif call_text == 'en_lang':
-        await data_b.update_db(name='language', data='en', id_data=call.from_user.id)
-        await edit_text_call(call, "You pick english language")
+    if call_text == 'sex_female':
+        await data_b.update_db(name='sex', data='female', id_data=call.from_user.id)
+    elif call_text == 'sex_men':
+        await data_b.update_db(name='sex', data='men', id_data=call.from_user.id)
+    await edit_text_call(call, "Отлично")

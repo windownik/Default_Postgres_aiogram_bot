@@ -5,7 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="771c6cd3-4bff-40ed-82a8-5b5e1d1c7914" name="Changes" comment="Rework sql file">
+      <change afterPath="$PROJECT_DIR$/modules/funcs_handlers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modules/handlers/admin_handlers/admin_reffs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/dispatcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/dispatcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/admin_handlers/admins_sender.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/all_state_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/all_state_handlers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/handlers/start_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/handlers/start_handlers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/keyboards.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/keyboards.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/sql_func.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/sql_func.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/token.json" beforeDir="false" afterPath="$PROJECT_DIR$/modules/token.json" afterDir="false" />
     </list>
@@ -36,16 +45,21 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="27Kk7hpsV2x4yHgnJuUh0vs9ITz" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "D:/IT/Python_3/Free_lanc/GIT/16- anon bot/16,2-chat_roll anon",
+    "settings.editor.selected.configurable": "proofread"
+  }
+}]]></component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Default_Postgres_aiogram_bot" />
@@ -125,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1656968379970</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Rework sql file">
+      <created>1656969328633</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1656969328633</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -34,6 +34,12 @@ class AdminSender(StatesGroup):
     confirm_sender = State()
 
 
+class AdminSpecialReff(StatesGroup):
+    start = State()
+    get_stat = State()
+    reff_list = State()
+
+
 class UserWork(StatesGroup):
     pick_category = State()
     pick_market = State()
